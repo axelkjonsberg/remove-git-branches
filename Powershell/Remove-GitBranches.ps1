@@ -1,11 +1,17 @@
 # TODO: Check if branch has incomming updates, if so, don't delete
-# TODO: Fix DeleteCurrent. Should check the * prefixes 
 
 function Remove-GitBranches {
     param (
         [Parameter(Mandatory = $false)]
         [bool]$DeleteCurrent = $false
     )
+
+    ### Local helper functions
+    function branchExists($branch) {
+        git show-ref --verify --quiet refs/heads/$branch
+        return $? -eq $true
+    }
+    ###
 
     # Check if not inside a Git repository
     if ((git rev-parse --is-inside-work-tree) -ne $true) {
@@ -19,21 +25,23 @@ function Remove-GitBranches {
     # Get current branch
     $currentBranch = git symbolic-ref --short -q HEAD
 
-    # If the switch flag is set, stash changes and switch to main or master
-    if ($DeleteCurrent -and $currentBranch -ne 'main' -and $currentBranch -ne 'master') {
-        git stash --include-untracked
-        if (git show-ref --verify --quiet refs/heads/main) {
-            git checkout main
+    $masterBranch = ''
+    if ($DeleteCurrent) {
+        if (branchExists 'master') {
+            $masterBranch = 'master'
         }
-        # If main does not exist, but master does, switch to it
-        if (!(git show-ref --verify --quiet refs/heads/main) -and (git show-ref --verify --quiet refs/heads/master)) {
-            git checkout master
+
+        if (branchExists 'main') {
+            $masterBranch = 'main'
         }
-        if (!(git show-ref --verify --quiet refs/heads/main) -and !(git show-ref --verify --quiet refs/heads/master)) {
-            Write-Host "Neither 'main' nor 'master' branches exist. Cannot switch branches" -ForegroundColor Red
+
+        if ($masterBranch -eq '') {
+            Write-Host "Neither 'main' nor 'master' branches exist. Cannot switch branches after deleting current." -ForegroundColor Red
             return
         }
     }
+
+    $shouldSwitchBranch = $DeleteCurrent -and $currentBranch -ne $masterBranch
 
     # Get a list of branches to delete
     $branchesToDelete = git branch | ForEach-Object {
@@ -67,22 +75,34 @@ function Remove-GitBranches {
     # Display branches to delete and prompt for confirmation
     Write-Host "The following local Git branches will be deleted:" -ForegroundColor Yellow
     $branchesToDelete | ForEach-Object { Write-Host "  - $_" -ForegroundColor Magenta }
+    if ($shouldSwitchBranch) {
+        Write-Host "(Changes in current branch $currentBranch will be stashed before branches are deleted. `nThe stashed changes will be applied to branch $masterBranch.)" -ForegroundColor Cyan
+    }
     $confirmation = Read-Host "Are you sure you want to delete these branches? (y/N)"
 
-    if ($confirmation -eq 'y') {
-        $branchesToDelete | ForEach-Object {
-            git branch -D $_
-        }
-        Write-Host "The branches were deleted successfully" -ForegroundColor Green
+    if ($confirmation -ne 'y') {
+        Write-Host "No branches were deleted" -ForegroundColor Cyan
         return
     }
+    
+    # If the DeleteCurrent flag is true, and current branch is equal to master branch, stash changes, switch to main or master, and pop and apply stash
+    if ($shouldSwitchBranch) {
+        Write-Host "Stashing changes in $currentBranch and switching to branch $masterBranch" -ForegroundColor Cyan
+        git stash --include-untracked
+        git checkout $masterBranch
+        git stash pop
+        Write-Host "Switched to branch $masterBranch and popped stashed changes from $currentBranch" -ForegroundColor Cyan
+    }
 
-    Write-Host "No branches were deleted" -ForegroundColor Cyan
+    $branchesToDelete | ForEach-Object {
+        git branch -D $_
+    }
+    Write-Host "The branches were deleted successfully" -ForegroundColor Green
 }
 
 New-Alias -Name rgb -Value Remove-GitBranches
 
-function Remove-GitBranchesWithSwitch {
+function Remove-GitBranchesIncludingCurrent {
     Remove-GitBranches -DeleteCurrent $true
 }
-New-Alias -Name rgbdc -Value Remove-GitBranchesWithSwitch
+New-Alias -Name rgbdc -Value Remove-GitBranchesIncludingCurrent

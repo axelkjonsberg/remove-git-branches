@@ -9,26 +9,26 @@ function Remove-GitBranches {
         git show-ref --verify --quiet refs/heads/$branch
         return $? -eq $true
     }
-    ###
 
-    # Check if not inside a Git repository
     if ((git rev-parse --is-inside-work-tree) -ne $true) {
         Write-Host "Not inside a Git repository" -ForegroundColor Red
         return
     }
 
-    # Fetch and prune
     git fetch -p
 
     $currentBranch = (git symbolic-ref --short -q HEAD).Trim()
 
-    $masterBranch = if ($DeleteCurrent) {
-        if (branchExists 'master') { 'master' }
-        elseif (branchExists 'main') { 'main' }
-        else {
-            Write-Host "Neither 'main' nor 'master' branches exist. Cannot switch branches after deleting current." -ForegroundColor Red
-            return
-        }
+    $masterBranch =
+    if (branchExists 'master') { 'master' }
+    elseif (branchExists 'main') { 'main' }
+
+    if (-not $DeleteCurrent -and $null -ne $masterBranch -and $currentBranch -ne $masterBranch) {
+        $DeleteCurrent = (Read-Host "Also delete current branch '$currentBranch' and switch to '$masterBranch'? (y/N)") -eq 'y'
+    }
+
+    if ($DeleteCurrent -and - $null -eq $masterBranch -and $currentBranch -ne $masterBranch) {
+        Write-Host "Neither 'main' nor 'master' branches exist. Cannot switch branches after deleting current." -ForegroundColor Red
     }
 
     $localBranches = (git branch).ForEach({ $_.Trim().Replace('* ', '') })

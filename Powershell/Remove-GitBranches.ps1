@@ -23,12 +23,17 @@ function Remove-GitBranches {
     if (branchExists 'master') { 'master' }
     elseif (branchExists 'main') { 'main' }
 
-    if (-not $DeleteCurrent -and $null -ne $masterBranch -and $currentBranch -ne $masterBranch) {
+    $masterBranchExists = $null -ne $masterBranch
+
+    if (-not $DeleteCurrent -and $masterBranchExists -and $currentBranch -ne $masterBranch) {
         $DeleteCurrent = (Read-Host "Also delete current branch '$currentBranch' and switch to '$masterBranch'? (y/N)") -eq 'y'
     }
 
-    if ($DeleteCurrent -and - $null -eq $masterBranch -and $currentBranch -ne $masterBranch) {
+    $shouldSwitchBranch = $DeleteCurrent -and $currentBranch -ne $masterBranch
+
+    if ($shouldSwitchBranch -and -not $masterBranchExists) {
         Write-Host "Neither 'main' nor 'master' branches exist. Cannot switch branches after deleting current." -ForegroundColor Red
+        return
     }
 
     $localBranches = (git branch).ForEach({ $_.Trim().Replace('* ', '') })
@@ -49,8 +54,7 @@ function Remove-GitBranches {
         return
     }
     
-    # Switch branch if current should be deleted and current is not master branch
-    if ($DeleteCurrent -and $currentBranch -ne $masterBranch) {
+    if ($shouldSwitchBranch) {
         git checkout $masterBranch
     }
 

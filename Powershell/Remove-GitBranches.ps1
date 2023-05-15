@@ -75,11 +75,8 @@ function Remove-GitBranches {
     # Display branches to delete and prompt for confirmation
     Write-Host "The following local Git branches will be deleted:" -ForegroundColor Yellow
     $branchesToDelete | ForEach-Object { Write-Host "  - $_" -ForegroundColor Magenta }
-    if ($shouldSwitchBranch) {
-        Write-Host "(Changes in current branch $currentBranch will be stashed before branches are deleted. `nThe stashed changes will be applied to branch $masterBranch.)" -ForegroundColor Cyan
-    }
     $confirmation = Read-Host "Are you sure you want to delete these branches? (y/N)"
-
+    
     if ($confirmation -ne 'y') {
         Write-Host "No branches were deleted" -ForegroundColor Cyan
         return
@@ -87,11 +84,15 @@ function Remove-GitBranches {
     
     # If the DeleteCurrent flag is true, and current branch is equal to master branch, stash changes, switch to main or master, and pop and apply stash
     if ($shouldSwitchBranch) {
-        Write-Host "Stashing changes in $currentBranch and switching to branch $masterBranch" -ForegroundColor Cyan
-        git stash --include-untracked
+        $stashChanges = Read-Host "Stash and apply uncommited changes in current branch $currentBranch to branch $masterBranch?  (y/N)"
+
+        if ($stashChanges = 'y') {
+            git stash --include-untracked
+        }
         git checkout $masterBranch
-        git stash pop
-        Write-Host "Switched to branch $masterBranch and popped stashed changes from $currentBranch" -ForegroundColor Cyan
+        if ($stashChanges = 'y') {
+            git stash pop
+        }
     }
 
     $branchesToDelete | ForEach-Object {

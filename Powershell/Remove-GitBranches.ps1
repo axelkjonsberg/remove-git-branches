@@ -1,5 +1,3 @@
-# TODO: Check if branch has incomming updates, if so, don't delete
-
 function Remove-GitBranches {
     param (
         [Parameter(Mandatory = $false)]
@@ -43,15 +41,22 @@ function Remove-GitBranches {
 
     $shouldSwitchBranch = $DeleteCurrent -and $currentBranch -ne $masterBranch
 
+    # Get a list of local branches
+    $localBranches = git branch | ForEach-Object {
+        # Remove the asterisk prefix if present and trim white spaces
+        $branchName = $_.Trim().Replace('* ', '')
+        return $branchName
+    }
+
+    # Get a list of remote branches
+    $remoteBranches = git branch -r | ForEach-Object {
+        # Remove the "origin/" prefix and trim white spaces
+        $branchName = $_.Trim().Replace('origin/', '')
+        return $branchName
+    }
+
     # Get a list of branches to delete
-    $branchesToDelete = git branch | ForEach-Object {
-        $branchName = $_.Trim()
-
-        # Remove the asterisk prefix if present
-        if ($branchName.StartsWith('* ')) {
-            $branchName = $branchName.Substring(2)
-        }
-
+    $branchesToDelete = $localBranches | Where-Object { $branchName = $_; -not ($remoteBranches -contains $branchName) } | ForEach-Object {
         # Skip master and main branches
         if ($branchName -eq 'master' -or $branchName -eq 'main') {
             return

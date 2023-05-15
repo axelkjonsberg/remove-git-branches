@@ -89,15 +89,7 @@ function Remove-GitBranches {
     
     # If the DeleteCurrent flag is true, and current branch is equal to master branch, stash changes, switch to main or master, and pop and apply stash
     if ($shouldSwitchBranch) {
-        $stashChanges = Read-Host "Stash and apply uncommited changes in current branch $currentBranch to branch $masterBranch?  (y/N)"
-
-        if ($stashChanges -eq 'y') {
-            git stash --include-untracked
-        }
         git checkout $masterBranch
-        if ($stashChanges -eq 'y') {
-            git stash pop
-        }
     }
 
     $branchesToDelete | ForEach-Object {

@@ -86,11 +86,11 @@ function Remove-GitBranches {
     if ($shouldSwitchBranch) {
         $stashChanges = Read-Host "Stash and apply uncommited changes in current branch $currentBranch to branch $masterBranch?  (y/N)"
 
-        if ($stashChanges = 'y') {
+        if ($stashChanges -eq 'y') {
             git stash --include-untracked
         }
         git checkout $masterBranch
-        if ($stashChanges = 'y') {
+        if ($stashChanges -eq 'y') {
             git stash pop
         }
     }

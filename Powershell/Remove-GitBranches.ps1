@@ -26,7 +26,7 @@ function Remove-GitBranches {
     $masterBranchExists = $null -ne $masterBranch
 
     if (-not $DeleteCurrent -and $masterBranchExists -and $currentBranch -ne $masterBranch) {
-        $DeleteCurrent = (Read-Host "Also delete current branch '$currentBranch' and switch to '$masterBranch'? (y/N)") -eq 'y'
+        $DeleteCurrent = (Read-Host "Also delete current branch '$currentBranch' and switch to '$masterBranch'? (Y/n)") -ne 'n'
     }
 
     $shouldSwitchBranch = $DeleteCurrent -and $currentBranch -ne $masterBranch
@@ -49,7 +49,7 @@ function Remove-GitBranches {
     Write-Host "The following local Git branches will be deleted:" -ForegroundColor Yellow
     $branchesToDelete | ForEach-Object { Write-Host "  - $_" -ForegroundColor Magenta }
     
-    if ((Read-Host "Are you sure you want to delete these branches? (y/N)") -ne 'y') {
+    if ((Read-Host "Are you sure you want to delete these branches? (Y/n)") -eq 'n') {
         Write-Host "No branches were deleted" -ForegroundColor Cyan
         return
     }

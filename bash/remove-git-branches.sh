@@ -25,7 +25,7 @@ function remove-git-branches {
     fi
 
     if [[ -z "$delete_current" && -n "$default_branch" && "$current_branch" != "$default_branch" ]]; then
-        read -p "Also delete current branch $current_branch and switch to $default_branch? (Y/n): " choice
+        read -p "Also delete current branch '$current_branch' and switch to '$default_branch'? (Y/n): " choice
         if [[ ! "$choice" =~ ^[Nn]$ ]]; then
             delete_current=true
         fi

@@ -1,8 +1,4 @@
 function Remove-GitBranches {
-    param (
-        [Parameter(Mandatory = $false)]
-        [bool]$DeleteCurrent = $false
-    )
 
     ### Local helper functions
     function branchExists($branch) {
@@ -10,6 +6,12 @@ function Remove-GitBranches {
         return $? -eq $true
     }
 
+    function hasRemote($branch) {
+        git show-ref --verify --quiet refs/remotes/origin/$branch
+        return $? -eq $true
+    }
+    
+    ### Start of function logic
     if ((git rev-parse --is-inside-work-tree) -ne $true) {
         Write-Host "Not inside a Git repository" -ForegroundColor Red
         return
@@ -25,11 +27,12 @@ function Remove-GitBranches {
 
     $masterBranchExists = $null -ne $masterBranch
 
-    if (-not $DeleteCurrent -and $masterBranchExists -and $currentBranch -ne $masterBranch) {
-        $DeleteCurrent = (Read-Host "Also delete current branch '$currentBranch' and switch to '$masterBranch'? (Y/n)") -ne 'n'
+    # Check if current branch has a remote and if user wants to delete the current branch
+    if (-not (hasRemote $currentBranch) -and $masterBranchExists -and $currentBranch -ne $masterBranch) {
+        $deleteCurrent = (Read-Host "Also delete current branch '$currentBranch' and switch to '$masterBranch'? (Y/n)") -ne 'n'
     }
 
-    $shouldSwitchBranch = $DeleteCurrent -and $currentBranch -ne $masterBranch
+    $shouldSwitchBranch = $deleteCurrent -and $currentBranch -ne $masterBranch
 
     if ($shouldSwitchBranch -and -not $masterBranchExists) {
         Write-Host "Neither 'main' nor 'master' branches exist. Cannot switch branches after deleting current." -ForegroundColor Red
@@ -39,7 +42,7 @@ function Remove-GitBranches {
     $localBranches = (git branch).ForEach({ $_.Trim().Replace('* ', '') })
     $remoteBranches = (git branch -r).ForEach({ $_.Trim().Replace('origin/', '') })
 
-    $branchesToDelete = $localBranches | Where-Object { $_ -notin $remoteBranches -and $_ -ne 'master' -and $_ -ne 'main' -and (($_ -ne $currentBranch) -or $DeleteCurrent) }
+    $branchesToDelete = $localBranches | Where-Object { $_ -notin $remoteBranches -and $_ -ne 'master' -and $_ -ne 'main' -and (($_ -ne $currentBranch) -or $deleteCurrent) }
 
     if (-not $branchesToDelete) {
         Write-Host "No branches to delete" -ForegroundColor Cyan
@@ -66,8 +69,3 @@ function Remove-GitBranches {
 }
 
 New-Alias -Name rgb -Value Remove-GitBranches
-
-function Remove-GitBranchesIncludingCurrent {
-    Remove-GitBranches -DeleteCurrent $true
-}
-New-Alias -Name rgbdc -Value Remove-GitBranchesIncludingCurrent

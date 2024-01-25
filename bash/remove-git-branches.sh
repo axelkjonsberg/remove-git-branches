@@ -35,7 +35,7 @@ function remove-git-branches {
     remote_exists=$?
 
     if [[ -z "$delete_current" && -n "$default_branch" && "$current_branch" != "$default_branch" && $remote_exists -ne 0 ]]; then
-        read -p "Also delete current branch '$current_branch' and switch to '$default_branch'? (Y/n): " choice
+        read -p "Current branch '$current_branch' has no remote; delete this and switch to '$default_branch'? (Y/n): " choice
         choice=$(echo "$choice" | tr '[:upper:]' '[:lower:]')
         delete_current=$([[ "$choice" == "n" ]] && echo "false" || echo "true")
     fi

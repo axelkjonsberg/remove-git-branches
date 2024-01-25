@@ -29,7 +29,7 @@ function Remove-GitBranches {
 
     # Check if current branch has a remote and if user wants to delete the current branch
     if (-not (hasRemote $currentBranch) -and $masterBranchExists -and $currentBranch -ne $masterBranch) {
-        $deleteCurrent = (Read-Host "Also delete current branch '$currentBranch' and switch to '$masterBranch'? (Y/n)") -ne 'n'
+        $deleteCurrent = (Read-Host "Current branch '$currentBranch' has no remote; delete this and switch to '$masterBranch'? (Y/n)") -ne 'n'
     }
 
     $shouldSwitchBranch = $deleteCurrent -and $currentBranch -ne $masterBranch

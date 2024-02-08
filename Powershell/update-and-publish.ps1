@@ -15,4 +15,4 @@ git add $ManifestPath
 git commit -m "Update module manifest version to $LatestTag"
 git push --set-upstream origin "$(git branch --show-current)"
 
-Publish-Module -Path '.' -NuGetApiKey $NuGetApiKey
+Publish-Module -Path 'Powershell\RemoveGitBranches.psd1' -NuGetApiKey $NuGetApiKey

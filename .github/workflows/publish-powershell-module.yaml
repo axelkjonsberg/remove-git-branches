@@ -3,6 +3,7 @@ name: Release and Publish PowerShell Module
 on:
   release:
     types: [published]
+  workflow_dispatch:
 
 jobs:
   update-and-publish:

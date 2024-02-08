@@ -1,0 +1,17 @@
+name: Release and Publish PowerShell Module
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  update-and-publish:
+    runs-on: windows-latest
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v4
+
+      - name: Execute update-and-publish process
+        run: |
+          ./update-and-publish.ps1 -ManifestPath 'Powershell/RemoveGitBranches.psd1' -NuGetApiKey ${{ secrets.PSGALLERY_API_KEY }}
+        shell: pwsh

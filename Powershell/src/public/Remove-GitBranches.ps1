@@ -1,17 +1,4 @@
 function Remove-GitBranches {
-
-    ### Local helper functions
-    function branchExists($branch) {
-        git show-ref --verify --quiet refs/heads/$branch
-        return $? -eq $true
-    }
-
-    function hasRemote($branch) {
-        git show-ref --verify --quiet refs/remotes/origin/$branch
-        return $? -eq $true
-    }
-    
-    ### Start of function logic
     if ((git rev-parse --is-inside-work-tree) -ne $true) {
         Write-Host "Not inside a Git repository" -ForegroundColor Red
         return
@@ -39,8 +26,8 @@ function Remove-GitBranches {
         return
     }
 
-    $localBranches = (git branch).ForEach({ $_.Trim().Replace('* ', '') })
-    $remoteBranches = (git branch -r).ForEach({ $_.Trim().Replace('origin/', '') })
+    $localBranches = (git branch).ForEach({ $_.Trim().Replace('* ','') })
+    $remoteBranches = (git branch -r).ForEach({ $_.Trim().Replace('origin/','') })
 
     $branchesToDelete = $localBranches | Where-Object { $_ -notin $remoteBranches -and $_ -ne 'master' -and $_ -ne 'main' -and (($_ -ne $currentBranch) -or $deleteCurrent) }
 
@@ -51,12 +38,12 @@ function Remove-GitBranches {
 
     Write-Host "The following local Git branches will be deleted:" -ForegroundColor Yellow
     $branchesToDelete | ForEach-Object { Write-Host "  - $_" -ForegroundColor Magenta }
-    
+
     if ((Read-Host "Are you sure you want to delete these branches? (Y/n)") -eq 'n') {
         Write-Host "No branches were deleted" -ForegroundColor Cyan
         return
     }
-    
+
     if ($shouldSwitchBranch) {
         git checkout $masterBranch
     }
@@ -67,5 +54,3 @@ function Remove-GitBranches {
 
     Write-Host "The branches were deleted successfully" -ForegroundColor Green
 }
-
-New-Alias -Name rgb -Value Remove-GitBranches

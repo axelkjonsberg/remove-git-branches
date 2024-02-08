@@ -14,5 +14,5 @@ jobs:
 
       - name: Execute update-and-publish process
         run: |
-          ./.github/workflows/update-and-publish.ps1 -ManifestPath 'Powershell/RemoveGitBranches.psd1' -NuGetApiKey ${{ secrets.PSGALLERY_API_KEY }} -LatestTag '${{ github.event.release.tag_name }}'
+          ./Powershell/update-and-publish.ps1 -ManifestPath 'Powershell/RemoveGitBranches.psd1' -NuGetApiKey ${{ secrets.PSGALLERY_API_KEY }} -LatestTag '${{ github.event.release.tag_name }}'
         shell: pwsh

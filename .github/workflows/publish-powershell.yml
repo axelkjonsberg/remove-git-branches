@@ -1,0 +1,14 @@
+name: Publish
+on: [workflow_dispatch]
+
+jobs:
+  build:
+    name: Publish
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Publish
+        env:
+          PSGALLERY_API_KEY: ${{ secrets.PSGALLERY_API_KEY }}
+        run: .\PowerShell\publish.ps1
+        shell: pwsh

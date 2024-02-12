@@ -1,6 +1,16 @@
 # RGB for Powershell
 
-You can add this function to your PowerShell profile so that it is available whenever you start a new session.
+## Installation
+
+### Using PowerShell Gallery
+
+To install _RemoveGitBranches_,  use `Install-Module -Name RemoveGitBranches`.
+
+More info on the module can be found at its [PowerShell Gallery page](https://www.powershellgallery.com/packages/RemoveGitBranches).
+
+### Manually add to PowerShell profile
+
+You can add the `Remove-GitBranches` module to your PowerShell profile so that it is available whenever you start a new session.
 
 The profile file is typically found at: `$HOME\Documents\WindowsPowerShell\Microsoft.PowerShell_profile.ps1`.
 

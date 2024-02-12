@@ -1,5 +1,5 @@
 @{
-    ModuleVersion           = '1.1.1'
+    ModuleVersion           = '1.1.2'
     GUID                    = '615a69f2-12da-4a41-ae0a-9099a809ff22'
     Author                  = 'Axel M. Kjønsberg'
     Description             = 'Efficiently remove unused local Git branches by comparing them to existing branches in the remote repo.'

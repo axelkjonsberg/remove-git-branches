@@ -12,7 +12,7 @@
         PSData = @{
             Tags            = 'git', 'cleanup', 'branch', 'powershell'
             ProjectUri      = 'https://github.com/axelkjonsberg/remove-git-branches'
-            LicenseUri      = 'https://github.com/axelkjonsberg/remove-git-branches/blob/main/LICENSE'
+            LicenseUri      = 'https://github.com/axelkjonsberg/remove-git-branches/blob/master/LICENSE'
             ReleaseNotes    = 'https://github.com/axelkjonsberg/remove-git-branches/releases'
         }
     }

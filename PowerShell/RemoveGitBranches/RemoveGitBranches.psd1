@@ -1,8 +1,8 @@
 @{
-    ModuleVersion           = '1.1.2'
+    ModuleVersion           = '1.1.3'
     GUID                    = '615a69f2-12da-4a41-ae0a-9099a809ff22'
     Author                  = 'Axel M. Kjønsberg'
-    Description             = 'Efficiently remove unused local Git branches by comparing them to existing branches in the remote repo.'
+    Description             = 'Remove unused local Git branches by comparing them to existing branches in the remote repo.'
     PowerShellVersion       = '5.1'
     CompatiblePSEditions    = @('Desktop', 'Core')
     RootModule              = 'RemoveGitBranches.psm1'

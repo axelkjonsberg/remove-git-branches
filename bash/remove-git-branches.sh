@@ -1,28 +1,44 @@
 #!/bin/bash
 
+function git-culture-invariant {
+    git -c core.quotepath=off \
+        -c i18n.logOutputEncoding=utf-8 \
+        -c i18n.commitEncoding=utf-8 "$@"
+}
+
 function branch-exists {
-    git show-ref --verify --quiet refs/heads/$1
+    git-culture-invariant show-ref --verify --quiet refs/heads/$1
     return $?
 }
 
 function has-remote {
-    git show-ref --verify --quiet refs/remotes/origin/$1
+    git-culture-invariant show-ref --verify --quiet refs/remotes/origin/$1
     return $?
 }
 
-function remove-git-branches {
+function branch-exists {
+    git-culture-invariant show-ref --verify --quiet refs/heads/$1
+    return $?
+}
+
+function has-remote {
+    git-culture-invariant show-ref --verify --quiet refs/remotes/origin/$1
+    return $?
+}
+
+function remove-git-branches {    
     delete_current=$1
 
-    is_inside_work_tree=$(git rev-parse --is-inside-work-tree)
+    is_inside_work_tree=$(git-culture-invariant rev-parse --is-inside-work-tree)
 
     if [[ ! $is_inside_work_tree ]]; then
         printf "\e[0;31mNot inside a Git repository\e[0m\n"
         return 1
     fi
 
-    git fetch -p
+    git-culture-invariant fetch -p
 
-    current_branch=$(git symbolic-ref --short -q HEAD | xargs)
+    current_branch=$(git-culture-invariant symbolic-ref --short -q HEAD | xargs)
 
     default_branch=''
     if branch-exists 'master'; then
@@ -45,8 +61,8 @@ function remove-git-branches {
         return 1
     fi
 
-    local_branches=($(git branch | sed 's/\* //'))
-    remote_branches=($(git branch -r | sed 's/origin\///g' | sed 's/HEAD -> //' | sort -u))
+    local_branches=($(git-culture-invariant branch | sed 's/\* //'))
+    remote_branches=($(git-culture-invariant branch -r | sed 's/origin\///g' | sed 's/HEAD -> //' | sort -u))
 
     branches_to_delete=()
     for branch in "${local_branches[@]}"; do
@@ -76,11 +92,11 @@ function remove-git-branches {
 
 
     if [[ $delete_current == true && "$current_branch" != "$default_branch" ]]; then
-        git switch $default_branch
+        git-culture-invariant switch $default_branch
     fi
 
     for branch in "${branches_to_delete[@]}"; do
-        git branch -D "$branch"
+        git-culture-invariant branch -D "$branch"
     done
 
     printf "\e[0;32mThe local branches were deleted successfully\e[0m\n"

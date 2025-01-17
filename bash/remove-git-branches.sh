@@ -35,7 +35,7 @@ function remove-git-branches {
     remote_exists=$?
 
     if [[ -z "$delete_current" && -n "$default_branch" && "$current_branch" != "$default_branch" && $remote_exists -ne 0 ]]; then
-        read -p "Current branch '$current_branch' has no remote; delete this and switch to '$default_branch'? (Y/n): " choice
+        read -p "Current local branch '$current_branch' has no remote; delete this and switch to '$default_branch'? (Y/n): " choice
         choice=$(echo "$choice" | tr '[:upper:]' '[:lower:]')
         delete_current=$([[ "$choice" == "n" ]] && echo "false" || echo "true")
     fi
@@ -58,7 +58,7 @@ function remove-git-branches {
     done
 
     if [[ ${#branches_to_delete[@]} -eq 0 ]]; then
-        printf "\e[0;36mNo branches to delete\e[0m\n"
+        printf "\e[0;36mNo local branches to delete\e[0m\n"
         return 0
     fi
 
@@ -67,10 +67,10 @@ function remove-git-branches {
         echo -e "\e[35m  - $branch\e[0m"
     done
 
-    read -p "Are you sure you want to delete these branches? (Y/n): " choice
+    read -p "Are you sure you want to delete these local branches? (Y/n): " choice
     choice=$(echo "$choice" | tr '[:upper:]' '[:lower:]')
     if [[ "$choice" == "n" ]]; then
-        printf "\e[0;36mNo branches were deleted\e[0m\n"
+        printf "\e[0;36mNo local branches were deleted\e[0m\n"
         exit 0
     fi
 
@@ -83,7 +83,7 @@ function remove-git-branches {
         git branch -D "$branch"
     done
 
-    printf "\e[0;32mThe branches were deleted successfully\e[0m\n"
+    printf "\e[0;32mThe local branches were deleted successfully\e[0m\n"
 }
 
 remove-git-branches $1

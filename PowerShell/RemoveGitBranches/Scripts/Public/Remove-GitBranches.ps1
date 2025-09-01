@@ -1,4 +1,23 @@
 function Remove-GitBranches {
+    param(
+        [switch]$Help
+    )
+
+    if ($Help) {
+        Write-Host "`nRemove-GitBranches:" -ForegroundColor Cyan
+        Write-Host "A command for safely deleting local Git branches which have been deleted from remote repository." -ForegroundColor White
+        Write-Host "`nUSAGE:" -ForegroundColor Yellow
+        Write-Host "  Remove-GitBranches" -ForegroundColor White
+        Write-Host "`nOPTIONS:" -ForegroundColor Yellow
+        Write-Host "  -Help       Displays this help message." -ForegroundColor White
+        Write-Host "`nDESCRIPTION:" -ForegroundColor Yellow
+        Write-Host "  This command deletes local Git branches that no longer have a remote counterpart (except for the main and master branches)."
+        Write-Host "`nBEHAVIOR:" -ForegroundColor Yellow
+        Write-Host "  - Prompts the user before deleting branches without remotes."
+        Write-Host "  - Automatically switches to 'main' or 'master' branch after execution if necessary." -ForegroundColor White
+        return
+    }
+
     if ((git rev-parse --is-inside-work-tree) -ne $true) {
         Write-Host "Not inside a Git repository" -ForegroundColor Red
         return
@@ -34,7 +53,13 @@ function Remove-GitBranches {
         $localBranches = (Invoke-GitCultureInvariant -args @('branch')).ForEach({ $_.Trim().Replace('* ','') })
         $remoteBranches = (Invoke-GitCultureInvariant -args @('branch','-r')).ForEach({ $_.Trim().Replace('origin/','') })
 
-        $branchesToDelete = $localBranches | Where-Object { $_ -notin $remoteBranches -and $_ -ne 'master' -and $_ -ne 'main' -and (($_ -ne $currentBranch) -or $deleteCurrent) }
+        $branchesToDelete = $localBranches | Where-Object {
+            $branchHasNoRemote = $_ -notin $remoteBranches
+            $branchIsNotMaster = $_ -ne 'master' -and $_ -ne 'main'
+            $branchShouldBeDeletedIfCheckedOut = ($_ -ne $currentBranch) -or $deleteCurrent
+
+            $branchHasNoRemote -and $branchIsNotMaster -and $branchShouldBeDeletedIfCheckedOut
+        }
 
         if (-not $branchesToDelete) {
             Write-Host "No local branches to delete" -ForegroundColor Cyan
@@ -44,7 +69,7 @@ function Remove-GitBranches {
         Write-Host "The following local Git branches will be deleted:" -ForegroundColor Yellow
         $branchesToDelete | ForEach-Object { Write-Host "  - $_" -ForegroundColor Magenta }
 
-        if ((Read-Host "Are you sure you want to delete these local branches? (Y/n)") -eq 'n') {
+        if ((Read-Host "Delete these local branches? (Y/n)") -eq 'n') {
             Write-Host "No local branches were deleted" -ForegroundColor Cyan
             return
         }

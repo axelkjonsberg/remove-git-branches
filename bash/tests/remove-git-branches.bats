@@ -314,7 +314,8 @@ setup() {
     scrubbed_path="${scrubbed_path:+$scrubbed_path:}$entry"
   done
 
-  run env PATH="$scrubbed_path" bash -c "source '$SCRIPT_UNDER_TEST'; remove-git-branches --yes"
+  bash_path="$(command -v bash)"
+  run env PATH="$scrubbed_path" "$bash_path" -c "source '$SCRIPT_UNDER_TEST'; remove-git-branches --yes"
 
   [ "$status" -ne 0 ]
   [[ "$output" =~ [Gg]it.*not\ installed || "$output" =~ [Nn]ot\ in.*PATH ]]

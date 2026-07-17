@@ -72,7 +72,12 @@ EOF
     default_branch=main
   else
     if remote_head=$(git-culture-invariant symbolic-ref -q --short refs/remotes/origin/HEAD 2>/dev/null); then
-      default_branch=${remote_head#origin/}
+      candidate=${remote_head#origin/}
+      # Only treat it as the default if the branch actually exists locally;
+      # otherwise switching to it would silently DWIM-create it from the remote.
+      if branch-exists "$candidate"; then
+        default_branch=$candidate
+      fi
     fi
   fi
 

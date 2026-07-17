@@ -1,0 +1,7 @@
+@{
+  ExcludeRules = @(
+    'PSAvoidUsingWriteHost',
+    'PSUseSingularNouns',
+    'PSUseShouldProcessForStateChangingFunctions'
+  )
+}

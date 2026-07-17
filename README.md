@@ -9,3 +9,7 @@ If a local branch does not have any existing remote, remove it!
 
 The command will list all the branches it wants to delete and ask the user for confirmation.
 The command will also ask the user if they would like to delete their current branch (if they are not already on 'main' or 'master').
+
+## CI
+
+`.github/workflows/ci.yml` runs both suites (plus the linters) on every push and pull request.

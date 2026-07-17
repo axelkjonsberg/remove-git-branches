@@ -1,4 +1,4 @@
-@{
+﻿@{
     ModuleVersion           = '1.1.4'
     GUID                    = '615a69f2-12da-4a41-ae0a-9099a809ff22'
     Author                  = 'Axel M. Kjønsberg'

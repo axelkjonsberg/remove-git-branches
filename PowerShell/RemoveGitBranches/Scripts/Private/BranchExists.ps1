@@ -5,6 +5,6 @@ function branchExists {
         [string]$Branch
     )
 
-    git show-ref --verify --quiet refs/heads/$Branch
-    return $? -eq $true
+    Invoke-GitCultureInvariant -args @('show-ref', '--verify', '--quiet', "refs/heads/$Branch")
+    return $LASTEXITCODE -eq 0
 }

@@ -10,7 +10,7 @@ if (-not (Get-Command git -ErrorAction SilentlyContinue)) {
 }
 
 # Check PowerShell version
-if ($PSVersionTable.PSVersion -lt [Version]::new(5, 1)) {
+if ($PSVersionTable.PSVersion -lt [version]::new(5,1)) {
     $InitializationErrors += "PowerShell version 5.1 or later is required. Please update your PowerShell version."
 }
 
@@ -19,5 +19,5 @@ if ($InitializationErrors.Count -gt 0) {
     Write-Host "`nInitialization failed for 'Remove-GitBranches'. The module will not be fully loaded." -ForegroundColor Red
     Write-Host "Please resolve the following issues:" -ForegroundColor Yellow
     $InitializationErrors | ForEach-Object { Write-Host "- $_" -ForegroundColor Red }
-    return
+    throw "Initialization failed for 'Remove-GitBranches'. $($InitializationErrors -join ' ')"
 }

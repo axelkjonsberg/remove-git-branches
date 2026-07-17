@@ -5,6 +5,6 @@ function hasRemote {
         [string]$Branch
     )
 
-    git show-ref --verify --quiet refs/remotes/origin/$Branch
-    return $? -eq $true
+    $remoteBranches = Invoke-GitCultureInvariant -args @('for-each-ref', '--format=%(refname:lstrip=3)', 'refs/remotes')
+    return ($remoteBranches -contains $Branch)
 }

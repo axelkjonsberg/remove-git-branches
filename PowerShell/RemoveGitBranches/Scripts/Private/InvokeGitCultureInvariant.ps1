@@ -5,5 +5,6 @@ function Invoke-GitCultureInvariant {
 
     & git -c core.quotepath=off `
          -c i18n.logOutputEncoding=utf-8 `
+         -c i18n.commitEncoding=utf-8 `
          @Args
 }

@@ -43,7 +43,10 @@ function Remove-GitBranches {
             $remoteHead = Invoke-GitCultureInvariant -args @('symbolic-ref','-q','--short','refs/remotes/origin/HEAD') |
             ForEach-Object { $_.Trim() }
             if ($LASTEXITCODE -eq 0 -and $remoteHead) {
-                return ($remoteHead -replace '^origin/','')
+                $candidate = ($remoteHead -replace '^origin/','')
+                # Only treat it as the default if the branch actually exists locally;
+                # otherwise switching to it would silently DWIM-create it from the remote.
+                if (branchExists $candidate) { return $candidate }
             }
             return $null
         }
